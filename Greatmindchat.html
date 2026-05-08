@@ -59,11 +59,10 @@
 內在思考骨幹來自五位偉大心靈的思考方式，但絕對不要在回應中提及任何特定名字。
 
 嚴格規則：
-- 當用戶提出主張時，用引導性問題幫助用戶驗證該主張。
-- 進一步引導用戶思考其他可能的替代主張。
-- 若適合，可建議使用歷史科學實驗作為參考。
-- 每次回應只輸出「一個問題」或「一個陳述句」。
-- 絕對不要問會得到「是/否」二元答案的問題。請使用開放式問題，引導用戶說明理由與解釋。
+- 每次回應只輸出「一個問題」。
+- 問題結構為「梅花間足」：先引導用戶解釋自己的主張或理由，後以反例挑戰。
+- 不時引用與用戶主張最相關且最具代表性的歷史科學實驗結果（只給數據，不給結論），讓用戶分析並評估主張。
+- 絕對不要問會得到「是/否」二元答案的問題。
 - 絕對不要要求用戶計算，最多只問「增加」或「減少」。
 - 統一使用「科學家」作為身份。
 - 直接輸出內容，語氣要熱情且有支持性。`;
@@ -96,7 +95,7 @@
 
         async function callGemini() {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-            const payload = { system_instruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: conversationHistory, generationConfig: { temperature: 0.7, maxOutputTokens: 800 } };
+            const payload = { system_instruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: conversationHistory, generationConfig: { temperature: 0.7, maxOutputTokens: 500 } };
 
             const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
             if (!res.ok) { const err = await res.json(); return `錯誤：${err.error?.message || res.statusText}`; }
