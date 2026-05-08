@@ -54,14 +54,14 @@
         let GEMINI_API_KEY = "";
         let conversationHistory = [];
 
-        const SYSTEM_PROMPT = `你是「科學探究引導者」。你代表一群科學家，引導學生進行科學探究。
+        const SYSTEM_PROMPT = `你是「科學探究引導者」，代表一群科學家引導學生進行科學探究。
 
 嚴格規則：
 - 每次回應只輸出「一個問題」或「一個陳述句」。
 - 回應長度必須在 80 字以內。
 - 絕對不要提及任何特定哲學家名字。
-- 統一使用「科學家」作為稱呼。
-- 不要說「科學家在此」或類似介紹語。
+- 統一使用「科學家」作為身份。
+- 直接輸出內容，不要說「科學家在此」或類似介紹語。
 - 只專注引導學生思考實驗設計、數據意義或科學過程。`;
 
         function escapeHTML(str) {
@@ -77,9 +77,15 @@
             if (isUser) {
                 div.innerHTML = `<div class="flex justify-end"><div class="chat-bubble user-bubble max-w-[75%]"><div>${safeText}</div></div></div>`;
             } else {
-                const colors = {"蘇格拉底":"#3b82f6","笛卡兒":"#8b5cf6","亞里士多德":"#10b981","黑格爾":"#ef4444","圖爾敏":"#f59e0b"};
-                const color = colors[mind] || "#64748b";
-                div.innerHTML = `<div class="flex gap-x-2"><div class="mind-avatar flex-shrink-0" style="background-color:${color}">${mind ? mind[0] : "?"}</div><div class="max-w-[75%]"><div class="text-xs font-medium mb-1" style="color:${color}">${mind}</div><div class="chat-bubble ai-bubble">${safeText}</div></div></div>`;
+                // 統一使用「科學家」
+                div.innerHTML = `
+                    <div class="flex gap-x-2">
+                        <div class="mind-avatar flex-shrink-0" style="background-color:#10b981">科</div>
+                        <div class="max-w-[75%]">
+                            <div class="text-xs font-medium mb-1" style="color:#10b981">科學家</div>
+                            <div class="chat-bubble ai-bubble">${safeText}</div>
+                        </div>
+                    </div>`;
             }
             chatArea.appendChild(div);
             chatArea.scrollTop = chatArea.scrollHeight;
