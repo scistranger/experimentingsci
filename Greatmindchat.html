@@ -54,17 +54,18 @@
         let GEMINI_API_KEY = "";
         let conversationHistory = [];
 
-        const SYSTEM_PROMPT = `你是「科學探究引導者」，代表一群科學家引導學生進行科學探究。科學推理是對話的核心。
+        const SYSTEM_PROMPT = `你是「科學探究引導者」，是一位**熱情的科學家**！你的語氣要溫暖、鼓勵且充滿熱情（多用「太棒了！」「很好！」「讓我們一起想想」等語氣詞）。
 
 嚴格規則：
-- 當用戶提出主張時，必須使用引導性問題引導或挑戰用戶驗證該主張。
+- 科學推理是對話的核心。
+- 當用戶提出主張時，用引導性問題幫助用戶驗證該主張。
 - 進一步引導用戶思考其他可能的替代主張。
-- 若情境適合，可建議使用歷史科學實驗作為參考。
+- 若適合，可建議使用歷史科學實驗作為參考。
 - 每次回應只輸出「一個問題」或「一個陳述句」。
 - 回應長度必須在 100 字以內。
-- 絕對不要要求用戶進行計算，最多只問「增加」或「減少」。
+- 絕對不要要求用戶計算，最多只問「增加」或「減少」。
 - 統一使用「科學家」作為身份，不要提及任何特定哲學家名字。
-- 直接輸出內容，不要說「科學家在此」或類似介紹語。`;
+- 直接輸出內容，語氣要熱情且有支持性。`;
 
         function escapeHTML(str) {
             let escaped = str.replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]));
@@ -94,7 +95,7 @@
 
         async function callGemini() {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-            const payload = { system_instruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: conversationHistory, generationConfig: { temperature: 0.7, maxOutputTokens: 300 } };
+            const payload = { system_instruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: conversationHistory, generationConfig: { temperature: 0.7, maxOutputTokens: 350 } };
 
             const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
             if (!res.ok) { const err = await res.json(); return `錯誤：${err.error?.message || res.statusText}`; }
@@ -132,7 +133,7 @@
             GEMINI_API_KEY = key;
             document.getElementById('api-modal').style.display = 'none';
             setTimeout(() => {
-                const initText = "你好！今天我們來探討「植物生長時增加的質量到底從哪裡來？」這個問題。請先分享你的想法。";
+                const initText = "太棒了！今天我們來探討「植物生長時增加的質量到底從哪裡來？」這個問題。請先分享你的想法吧！";
                 addMessage(initText, false, "科學家");
                 conversationHistory.push({ role: "model", parts: [{ text: initText }] });
             }, 300);
@@ -142,7 +143,7 @@
         function resetChat() {
             document.getElementById('chat-area').innerHTML = '';
             conversationHistory = [];
-            const initText = "你好！今天我們來探討「植物生長時增加的質量到底從哪裡來？」這個問題。請先分享你的想法。";
+            const initText = "太棒了！今天我們來探討「植物生長時增加的質量到底從哪裡來？」這個問題。請先分享你的想法吧！";
             addMessage(initText, false, "科學家");
             conversationHistory.push({ role: "model", parts: [{ text: initText }] });
         }
