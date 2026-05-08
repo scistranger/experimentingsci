@@ -22,27 +22,15 @@
     <div id="api-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
         <div class="bg-zinc-900 rounded-2xl p-6 w-full max-w-md mx-4">
             <h2 class="text-xl font-bold mb-4 text-center">請輸入 Gemini API Key</h2>
-            <input id="api-key-input" type="password" 
-                   class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:border-emerald-500"
-                   placeholder="AIzaSy...">
-            <button onclick="saveApiKey()" 
-                    class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-xl font-medium">
-                開始使用
-            </button>
-            <div class="text-center mt-3">
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-emerald-400 text-sm hover:underline">如何取得 API Key？</a>
-            </div>
+            <input id="api-key-input" type="password" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:border-emerald-500" placeholder="AIzaSy...">
+            <button onclick="saveApiKey()" class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-xl font-medium">開始使用</button>
         </div>
     </div>
 
-    <!-- Main Chat Interface -->
     <div class="w-full max-w-[420px] bg-[#111b21] rounded-3xl overflow-hidden shadow-2xl border border-zinc-800">
-        
         <div class="chat-header px-4 py-3 flex items-center justify-between text-white">
             <div class="flex items-center gap-x-3">
-                <div class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
-                    <i class="fa-solid fa-brain text-white text-xl"></i>
-                </div>
+                <div class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center"><i class="fa-solid fa-brain text-white text-xl"></i></div>
                 <div>
                     <div class="font-semibold text-lg">科學探究引導者</div>
                     <div class="text-xs text-emerald-400">Powered by Gemini 2.5</div>
@@ -50,22 +38,15 @@
             </div>
             <div class="flex items-center gap-x-2">
                 <button onclick="changeApiKey()" class="text-xs px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded-full">更換 Key</button>
-                <button onclick="resetChat()" class="text-emerald-400 hover:text-white">
-                    <i class="fa-solid fa-redo"></i>
-                </button>
+                <button onclick="resetChat()" class="text-emerald-400 hover:text-white"><i class="fa-solid fa-redo"></i></button>
             </div>
         </div>
 
         <div id="chat-area" class="h-[520px] overflow-y-auto p-4 flex flex-col gap-y-3"></div>
 
         <div class="bg-[#202c33] px-4 py-3 flex items-center gap-x-2">
-            <input id="user-input" type="text" placeholder="輸入你的想法..."
-                   class="flex-1 bg-[#2a3942] text-white rounded-full px-5 py-2.5 text-sm focus:outline-none"
-                   onkeypress="if (event.key === 'Enter') sendMessage()">
-            <button onclick="sendMessage()"
-                    class="w-10 h-10 bg-emerald-600 hover:bg-emerald-700 rounded-full flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-paper-plane text-white"></i>
-            </button>
+            <input id="user-input" type="text" placeholder="輸入你的想法..." class="flex-1 bg-[#2a3942] text-white rounded-full px-5 py-2.5 text-sm focus:outline-none" onkeypress="if (event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()" class="w-10 h-10 bg-emerald-600 hover:bg-emerald-700 rounded-full flex-shrink-0"><i class="fa-solid fa-paper-plane text-white"></i></button>
         </div>
     </div>
 
@@ -73,12 +54,18 @@
         let GEMINI_API_KEY = "";
         let conversationHistory = [];
 
-        const SYSTEM_PROMPT = `你是「科學探究對話引導者」，使用五位偉大心靈（蘇格拉底、笛卡兒、亞里士多德、黑格爾、圖爾敏）引導學生進行科學探究。每輪只由一位心靈發言。只提供歷史實驗數據，要求學生自己推理。`;
+        const SYSTEM_PROMPT = `你是「科學探究引導者」。你代表一群科學家，引導學生進行科學探究。
+
+嚴格規則：
+- 每次回應只輸出「一個問題」或「一個陳述句」。
+- 回應長度必須在 80 字以內。
+- 絕對不要提及任何特定哲學家名字。
+- 統一使用「科學家」作為稱呼。
+- 不要說「科學家在此」或類似介紹語。
+- 只專注引導學生思考實驗設計、數據意義或科學過程。`;
 
         function escapeHTML(str) {
-            let escaped = str.replace(/[&<>'"]/g, tag => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-            }[tag]));
+            let escaped = str.replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]));
             return escaped.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
         }
 
@@ -92,14 +79,7 @@
             } else {
                 const colors = {"蘇格拉底":"#3b82f6","笛卡兒":"#8b5cf6","亞里士多德":"#10b981","黑格爾":"#ef4444","圖爾敏":"#f59e0b"};
                 const color = colors[mind] || "#64748b";
-                div.innerHTML = `
-                    <div class="flex gap-x-2">
-                        <div class="mind-avatar flex-shrink-0" style="background-color:${color}">${mind ? mind[0] : "?"}</div>
-                        <div class="max-w-[75%]">
-                            <div class="text-xs font-medium mb-1" style="color:${color}">${mind}</div>
-                            <div class="chat-bubble ai-bubble">${safeText}</div>
-                        </div>
-                    </div>`;
+                div.innerHTML = `<div class="flex gap-x-2"><div class="mind-avatar flex-shrink-0" style="background-color:${color}">${mind ? mind[0] : "?"}</div><div class="max-w-[75%]"><div class="text-xs font-medium mb-1" style="color:${color}">${mind}</div><div class="chat-bubble ai-bubble">${safeText}</div></div></div>`;
             }
             chatArea.appendChild(div);
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -107,61 +87,16 @@
 
         async function callGemini() {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+            const payload = { system_instruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: conversationHistory, generationConfig: { temperature: 0.7, maxOutputTokens: 250 } };
 
-            const payload = {
-                system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                contents: conversationHistory,
-                generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
-            };
-
-            try {
-                const res = await fetch(url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!res.ok) {
-                    const err = await res.json();
-                    return `錯誤：${err.error?.message || res.statusText}`;
-                }
-
-                const data = await res.json();
-                return data.candidates[0].content.parts[0].text;
-
-            } catch (error) {
-                return `網路錯誤：${error.message}`;
-            }
-        }
-
-        function saveApiKey() {
-            const input = document.getElementById('api-key-input').value.trim();
-            if (!input) {
-                alert("請輸入 API Key");
-                return;
-            }
-            GEMINI_API_KEY = input;
-            document.getElementById('api-modal').style.display = 'none';
-            
-            // 顯示開場白
-            setTimeout(() => {
-                const initText = "你好！今天我們來探討「植物生長時增加的質量到底從哪裡來？」這個問題。請先分享你的想法。";
-                addMessage(initText, false, "蘇格拉底");
-                conversationHistory.push({ role: "model", parts: [{ text: initText }] });
-            }, 300);
-        }
-
-        function changeApiKey() {
-            document.getElementById('api-modal').style.display = 'flex';
-            document.getElementById('api-key-input').value = GEMINI_API_KEY;
+            const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+            if (!res.ok) { const err = await res.json(); return `錯誤：${err.error?.message || res.statusText}`; }
+            const data = await res.json();
+            return data.candidates[0].content.parts[0].text;
         }
 
         async function sendMessage() {
-            if (!GEMINI_API_KEY) {
-                alert("請先輸入 API Key");
-                return;
-            }
-
+            if (!GEMINI_API_KEY) { alert("請先輸入 API Key"); return; }
             const input = document.getElementById('user-input');
             const text = input.value.trim();
             if (!text) return;
@@ -180,29 +115,32 @@
             const response = await callGemini();
             document.getElementById('loading').remove();
 
-            let mind = "蘇格拉底";
-            if (response.includes("笛卡兒")) mind = "笛卡兒";
-            else if (response.includes("亞里士多德")) mind = "亞里士多德";
-            else if (response.includes("黑格爾")) mind = "黑格爾";
-            else if (response.includes("圖爾敏")) mind = "圖爾敏";
-
-            addMessage(response, false, mind);
+            addMessage(response, false, "科學家");
             conversationHistory.push({ role: "model", parts: [{ text: response }] });
         }
 
+        function saveApiKey() {
+            const key = document.getElementById('api-key-input').value.trim();
+            if (!key) { alert("請輸入 API Key"); return; }
+            GEMINI_API_KEY = key;
+            document.getElementById('api-modal').style.display = 'none';
+            setTimeout(() => {
+                const initText = "你好！今天我們來探討「植物生長時增加的質量到底從哪裡來？」這個問題。請先分享你的想法。";
+                addMessage(initText, false, "科學家");
+                conversationHistory.push({ role: "model", parts: [{ text: initText }] });
+            }, 300);
+        }
+
+        function changeApiKey() { document.getElementById('api-modal').style.display = 'flex'; }
         function resetChat() {
             document.getElementById('chat-area').innerHTML = '';
             conversationHistory = [];
-            
             const initText = "你好！今天我們來探討「植物生長時增加的質量到底從哪裡來？」這個問題。請先分享你的想法。";
-            addMessage(initText, false, "蘇格拉底");
+            addMessage(initText, false, "科學家");
             conversationHistory.push({ role: "model", parts: [{ text: initText }] });
         }
 
-        window.onload = () => {
-            // 開啟時顯示 API Key 輸入視窗
-            document.getElementById('api-modal').style.display = 'flex';
-        };
+        window.onload = () => { document.getElementById('api-modal').style.display = 'flex'; };
     </script>
 </body>
 </html>
